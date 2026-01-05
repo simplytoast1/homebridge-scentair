@@ -7,16 +7,20 @@
     "schema": {
         "type": "object",
         "properties": {
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "default": "ScentAir",
+                "description": "The name of the platform."
+            },
             "email": {
                 "title": "Email",
                 "type": "string",
-                "required": true,
                 "format": "email"
             },
             "password": {
                 "title": "Password",
                 "type": "string",
-                "required": true,
                 "format": "password"
             },
             "showBacklight": {
@@ -31,6 +35,10 @@
                 "default": true,
                 "description": "Expose the device accent light (LED ring) to HomeKit."
             }
-        }
+        },
+        "required": [
+            "email",
+            "password"
+        ]
     }
 }
