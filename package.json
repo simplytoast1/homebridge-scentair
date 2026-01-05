@@ -1,6 +1,7 @@
 {
     "name": "homebridge-scentair",
-    "version": "1.0.0",
+    "version": "1.0.1",
+    "displayName": "ScentAir",
     "description": "Homebridge plugin for ScentAir diffusers",
     "license": "Apache-2.0",
     "repository": {
@@ -23,6 +24,7 @@
     },
     "keywords": [
         "homebridge-plugin",
+        "homebridge",
         "scentair",
         "homekit"
     ],
