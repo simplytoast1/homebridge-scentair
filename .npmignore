@@ -1,0 +1,5 @@
+src/
+examples/
+.gitignore
+tsconfig.json
+.eslintrc.json

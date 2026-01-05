@@ -1,0 +1,44 @@
+{
+    "name": "homebridge-scentair",
+    "version": "1.0.0",
+    "description": "Homebridge plugin for ScentAir diffusers",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/simplytoast1/homebridge-scentair.git"
+    },
+    "bugs": {
+        "url": "https://github.com/simplytoast1/homebridge-scentair/issues"
+    },
+    "engines": {
+        "node": "^18.17.0 || ^20.9.0 || ^22.0.0",
+        "homebridge": "^1.8.0 || ^2.0.0"
+    },
+    "main": "dist/index.js",
+    "scripts": {
+        "lint": "eslint src/**.ts",
+        "watch": "tsc -w",
+        "build": "rimraf ./dist && tsc",
+        "prepublishOnly": "npm run lint && npm run build"
+    },
+    "keywords": [
+        "homebridge-plugin",
+        "scentair",
+        "homekit"
+    ],
+    "dependencies": {
+        "axios": "^1.6.0",
+        "jsonwebtoken": "^9.0.0",
+        "homebridge-plugin-utils": "^1.0.0"
+    },
+    "devDependencies": {
+        "@types/jsonwebtoken": "^9.0.0",
+        "@types/node": "^20.9.0",
+        "@typescript-eslint/eslint-plugin": "^6.10.0",
+        "@typescript-eslint/parser": "^6.10.0",
+        "eslint": "^8.53.0",
+        "homebridge": "^1.8.0",
+        "rimraf": "^5.0.0",
+        "typescript": "^5.2.0"
+    }
+}

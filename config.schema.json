@@ -1,0 +1,36 @@
+{
+    "pluginAlias": "ScentAir",
+    "pluginType": "platform",
+    "singular": true,
+    "headerDisplay": "ScentAir Configuration",
+    "footerDisplay": "For support, visit the GitHub repository.",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "email": {
+                "title": "Email",
+                "type": "string",
+                "required": true,
+                "format": "email"
+            },
+            "password": {
+                "title": "Password",
+                "type": "string",
+                "required": true,
+                "format": "password"
+            },
+            "showBacklight": {
+                "title": "Show Backlight (Logo)",
+                "type": "boolean",
+                "default": true,
+                "description": "Expose the device backlight (logo light) to HomeKit."
+            },
+            "showAccentLight": {
+                "title": "Show Accent Light",
+                "type": "boolean",
+                "default": true,
+                "description": "Expose the device accent light (LED ring) to HomeKit."
+            }
+        }
+    }
+}
