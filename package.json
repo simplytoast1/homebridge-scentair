@@ -14,10 +14,14 @@
     },
     "homepage": "https://github.com/simplytoast1/homebridge-scentair#readme",
     "engines": {
-        "node": ">=18.17.0",
-        "homebridge": "^1.8.0 || ^2.0.0"
+        "homebridge": ">=1.8.0 || >=2.0.0",
+        "node": ">=18.17.0"
     },
     "main": "dist/index.js",
+    "files": [
+        "dist",
+        "config.schema.json"
+    ],
     "scripts": {
         "lint": "eslint src/**.ts",
         "watch": "tsc -w",
