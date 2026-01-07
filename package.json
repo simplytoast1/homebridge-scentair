@@ -32,7 +32,10 @@
         "homebridge-plugin",
         "homebridge",
         "scentair",
-        "homekit"
+        "homekit",
+        "scent",
+        "aroma",
+        "whisper"
     ],
     "dependencies": {
         "axios": "^1.6.0",
