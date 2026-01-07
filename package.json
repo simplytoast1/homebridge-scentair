@@ -1,6 +1,6 @@
 {
     "name": "homebridge-scentair",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "displayName": "ScentAir",
     "description": "Homebridge plugin for ScentAir diffusers",
     "author": "simplytoast1",
