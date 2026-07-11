@@ -8,6 +8,10 @@ const AUTH_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithP
 const REFRESH_URL = `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`;
 const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/scentconnect/databases/(default)/documents';
 
+// Network requests must not hang forever. A dropped (not refused) connection
+// would otherwise leave a request pending indefinitely and pile up sockets.
+const REQUEST_TIMEOUT_MS = 10000;
+
 export class ScentAirAPI {
     private session: AxiosInstance;
     private idToken: string | null = null;
@@ -19,7 +23,7 @@ export class ScentAirAPI {
         private readonly username: string,
         private readonly password: string,
     ) {
-        this.session = axios.create();
+        this.session = axios.create({ timeout: REQUEST_TIMEOUT_MS });
     }
 
     async login(): Promise<void> {
@@ -33,12 +37,16 @@ export class ScentAirAPI {
             const resp = await this.session.post(AUTH_URL, payload);
             const data = resp.data;
 
+            if (!data || !data.idToken) {
+                throw new Error('Login response did not contain an ID token');
+            }
+
             this.idToken = data.idToken;
             this.refreshToken = data.refreshToken;
 
-            // Decode token to get Organization ID
-            // We perform a non-verified decode as we trust the IDP response for this internal flow
-            const decoded: any = jwt.decode(this.idToken!);
+            // Decode token to get Organization ID.
+            // We perform a non-verified decode as we trust the IDP response for this internal flow.
+            const decoded: any = jwt.decode(this.idToken!) || {};
             const claims = decoded.claims || {};
             this.orgId = claims.orgId;
 
@@ -49,6 +57,8 @@ export class ScentAirAPI {
             this.log.debug(`Logged in. Org ID: ${this.orgId}`);
 
         } catch (error: any) {
+            // Log only the message: a raw axios error would serialize the request
+            // payload (the plaintext password) and headers into the log.
             this.log.error('Login failed:', error.message);
             throw error;
         }
@@ -62,12 +72,32 @@ export class ScentAirAPI {
 
         try {
             const resp = await this.session.post(REFRESH_URL, payload);
+            if (!resp.data || !resp.data.id_token) {
+                throw new Error('Refresh response did not contain an ID token');
+            }
             this.idToken = resp.data.id_token;
-            this.refreshToken = resp.data.refresh_token;
+            this.refreshToken = resp.data.refresh_token || this.refreshToken;
             this.log.debug('Token refreshed');
         } catch (error: any) {
             this.log.error('Token refresh failed:', error.message);
             throw error;
+        }
+    }
+
+    /**
+     * Recover from an expired/rejected session. Try a token refresh first; if the
+     * refresh token itself has been revoked (e.g. the user changed their password),
+     * discard the stale tokens and perform a full re-login so the client does not
+     * stay permanently wedged until a Homebridge restart.
+     */
+    private async reauthenticate(): Promise<void> {
+        try {
+            await this.refreshAuthToken();
+        } catch (error: any) {
+            this.log.debug('Token refresh failed, performing full login');
+            this.idToken = null;
+            this.refreshToken = null;
+            await this.login();
         }
     }
 
@@ -90,8 +120,8 @@ export class ScentAirAPI {
             return response.data;
         } catch (error: any) {
             if (error.response && error.response.status === 401) {
-                this.log.debug('Token expired, refreshing...');
-                await this.refreshAuthToken();
+                this.log.debug('Token expired, re-authenticating...');
+                await this.reauthenticate();
                 config.headers.Authorization = `Bearer ${this.idToken}`;
                 const response = await this.session.request(config);
                 return response.data;
